@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Rejestracja</title>
+    <link rel="stylesheet" href="style_reg.css">
+</head>
+<body>
+    <div class="container">
+       
+        <div class="left-panel">
+            
+                <div class="napis">
+                    <h1 class="block-effect" style="--td: 1.2s">
+                        <div class="block-reveal" style="--bc: #559281; --d: .1s">Task</div>
+                        <div class="block-reveal" style="--bc: #7d3cff; --d: .5s">Planner</div>
+                    </h1>
+                </div>
+
+                <p>Utwórz nowe konto</p><br>
+                <form id="register-form">
+
+                    <div class="input-container">
+                        
+                        <input type="text" id="first-name" name="first-name" placeholder="Imie" required><br>
+                    </div>
+
+                    <div class="input-container">
+                    
+                        <input type="text" id="last-name" name="last-name" placeholder="Nazwisko" required><br>
+                    </div>
+
+                    <div class="input-container">
+                       
+                        <input type="email" id="email" name="email" placeholder="Email" required><br>
+                    </div>
+
+                    <div class="input-container">
+                        
+                        <input type="password" id="password" name="password" placeholder="Hasło" required><br>
+                    </div>
+
+                    <div class="input-container">
+                    
+                        <input type="password" id="repassword" name="repassword" placeholder="Powtórz hasło" required><br>
+                    </div>
+
+                    <button type="submit">Zarejestruj</button>
+                    <div class="separator">Lub</div>
+                    <p><a href="index.html">Powrót do logowania</a></p>
+                </form>
+              
+            
+        </div>
+        
+        <!-- Prawa część: 65% szerokości - placeholder na grafikę -->
+        <div class="right-panel">
+            <img src="tasks.jpg" alt="Zdjęcie Task Manager" style="max-width: 100%; height: 100%;">
+        </div>
+    </div>
+
+    <script>
+        // Skrypt obsługujący rejestrację
+        document.getElementById('register-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Zatrzymanie domyślnego zachowania formularza
+
+            const firstName = document.getElementById('first-name').value.trim();
+            const lastName = document.getElementById('last-name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rePassword = document.getElementById('repassword').value.trim();
+
+            // Walidacja hasła
+            if (password !== rePassword) {
+                alert('Hasła nie są zgodne!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:5005/task-manager/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        first_name: firstName,
+                        last_name: lastName,
+                        email: email,
+                        password: password,
+                    }),
+                });
+
+                if (response.ok) {
+                    alert('Rejestracja zakończona sukcesem!');
+                    // Przekierowanie użytkownika po pomyślnej rejestracji
+                    window.location.assign('index.html');
+                } else {
+                    // Obsługa błędów rejestracji
+                    const errorData = await response.json();
+                    alert(`Błąd: ${errorData.message || 'Nie udało się zarejestrować użytkownika'}`);
+                }
+            } catch (error) {
+                console.error('Błąd połączenia:', error);
+                alert('Nie udało się połączyć z serwerem');
+            }
+        });
+    </script>
+</body>
+</html>

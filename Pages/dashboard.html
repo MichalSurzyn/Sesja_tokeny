@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strona główna</title>
+    <link rel="stylesheet" href="stylehome.css">
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1 class="block-effect" style="--td: 1.2s">
+                <div class="block-reveal" style="--bc: #559281; --d: .1s">Task</div>
+                <div class="block-reveal" style="--bc: #7d3cff; --d: .5s">Planner</div>
+            </h1>
+        </div>
+        <button class="create-btn">Utwórz</button>
+        <ul class="menu">
+            <li>Strona główna</li>
+            <li><a href="mytasks.html">Moje zadania</a></li>
+            <li>Cele</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <header>
+            <div class="user">
+                <h2>Dzień dobry, User</h2>
+            </div>
+            <div class="wyloguj">
+                <button class="logout" id="logout-btn">Wyloguj</button>
+            </div>
+        </header>
+        <div class="tasks-projects">
+            <div class="tasks">
+                <h3>Moje zadania</h3>
+                <ul>
+                    <li>Zadanie 1</li>
+                    <li>Zadanie 2</li>
+                    <li>Zadanie 3</li>
+                    <li>Zadanie 4</li>
+                    <li>Zadanie 5</li>
+                    <li>Zadanie 6</li>
+                </ul>
+            </div>
+            <div class="projects">
+                <h3>Projekty</h3>
+                <div class="group-list" id="main-group-list">
+                    <div class="add-group" id="main-add-group-btn">+</div>
+                </div>
+            </div>
+        </div>
+        <div class="team">
+            <h3>Osoby</h3>
+            <ul>
+                <li>Osoba 1</li>
+                <li>Osoba 2</li>
+                <li>Osoba 3</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainGroupList = document.getElementById('main-group-list');
+            const mainAddGroupBtn = document.getElementById('main-add-group-btn');
+            const logoutBtn = document.querySelector('.logout');
+            
+            // Funkcja renderująca grupy
+            function renderMainGroups(groups) {
+                mainGroupList.innerHTML = ''; // Wyczyść listę przed renderowaniem
+
+                if (groups.length === 0) {
+                    const emptyMessage = document.createElement('div');
+                    emptyMessage.className = 'empty-message';
+                    emptyMessage.textContent = 'Brak grup do wyświetlenia';
+                    mainGroupList.appendChild(emptyMessage);
+                } else {
+                    groups.forEach(group => {
+                        const groupItem = document.createElement('div');
+                        groupItem.className = 'group-item';
+                        groupItem.textContent = group.name; // Nazwa grupy
+                        groupItem.dataset.id = group._id; // Ustaw ID grupy w atrybucie data-id
+
+                        // Stwórz i dodaj przycisk "Usuń" do każdej kafelki grupy
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Usuń';
+                        deleteButton.className = 'delete-btn';
+                        
+                        // Obsługa kliknięcia przycisku "Usuń"
+                        deleteButton.addEventListener('click', async () => {
+                            const groupId = groupItem.dataset.id; // Pobierz ID grupy z atrybutu data-id
+                            console.log(groupId);
+                            const groupName = group.name;
+
+                            if (!groupId) {
+                                alert('Nie można znaleźć ID grupy!');
+                                return;
+                            }
+
+                            await handleGroupDeletion(groupId, groupName);
+                        });
+
+                        // Dodaj przycisk do kafelki
+                        groupItem.appendChild(deleteButton);
+
+                        // Dodaj kafelkę do listy grup
+                        mainGroupList.appendChild(groupItem);
+                    });
+                }
+
+                // Dodaj przycisk "Dodaj grupę" na końcu
+                mainGroupList.appendChild(mainAddGroupBtn);
+            }
+
+            async function handleGroupDeletion(groupId, groupName) {
+                const confirmDelete = confirm(`Czy na pewno chcesz usunąć grupę "${groupName}"?`);
+                console.log(groupId);
+                if (!confirmDelete) return;
+
+                try {
+                    const response = await fetch(`http://localhost:5005/task-manager/auth/delete/${groupId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                    });
+
+                    if (response.ok) {
+                        alert('Grupa została usunięta.');
+                        await fetchGroups(); // Odśwież grupy po usunięciu
+                    } else {
+                        const errorText = await response.json();
+                        throw new Error(errorText.message || 'Błąd serwera');
+                    }
+                } catch (error) {
+                    console.error('Błąd:', error);
+                    alert('Nie udało się usunąć grupy. ' + error.message);
+                }
+            }
+
+            // Pobieranie istniejących grup
+            async function fetchGroups() {
+                try {
+                    const response = await fetch('http://localhost:5005/task-manager/auth/groups', {
+                        method: 'GET',
+                        credentials: 'include', // Wysyłaj ciasteczka
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const groups = data.data || []; // Pobierz listę grup
+                        renderMainGroups(groups); // Renderuj grupy
+                    } else {
+                        console.error('Błąd serwera:', response.statusText);
+                        alert('Błąd serwera podczas pobierania grup.');
+                    }
+                } catch (error) {
+                    console.error('Błąd połączenia:', error);
+                    alert('Nie udało się połączyć z serwerem.');
+                }
+            }
+
+            // Wywołanie fetchGroups po załadowaniu strony
+            document.addEventListener('DOMContentLoaded', fetchGroups);
+
+            // Obsługa kliknięcia na przycisk dodawania grupy
+            
+            document.getElementById('main-add-group-btn').addEventListener('click', async () => {
+                const groupName = prompt('Podaj nazwę nowej grupy:');
+                const groupDescription = prompt('Podaj opis grupy:'); // Dodajemy opis grupy
+
+                if (!groupName || groupName.trim() === '') {
+                    alert('Nazwa grupy nie może być pusta.');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('http://localhost:5005/task-manager/auth/add-group', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            name: groupName.trim(),
+                            description: groupDescription.trim(), // Dodajemy opis grupy
+                        }),
+                    });
+
+                    if (response.ok) {
+                        alert('Grupa została utworzona pomyślnie.');
+                        await fetchGroups(); // Odśwież grupy
+                    } else {
+                        const errorText = await response.json();
+                        throw new Error(errorText.message || 'Błąd serwera');
+                    }
+                } catch (error) {
+                    console.error('Błąd:', error);
+                    alert('Nie udało się połączyć z serwerem. hcuj' + error.message);
+                }
+            });
+
+           
+
+            function addDeleteButtonsToGroups(groups) {
+                groups.forEach(group => {
+                    // Znajdź element grupy na podstawie ID
+                    const groupItem = document.querySelector(`.group-item[data-id="${group.id}"]`);
+                    if (!groupItem) return;
+
+                    // Sprawdź, czy przycisk "Usuń" już istnieje, aby uniknąć duplikatów
+                    const existingDeleteButton = groupItem.querySelector('.delete-btn');
+                    if (existingDeleteButton) return;
+
+                    // Utwórz przycisk "Usuń"
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Usuń';
+                    deleteButton.className = 'delete-btn';
+
+                    // Obsługa zdarzenia kliknięcia przycisku
+                    deleteButton.addEventListener('click', async () => {
+                        const confirmDelete = confirm(`Czy na pewno chcesz usunąć grupę "${group.name}"?`);
+                        if (!confirmDelete) return;
+
+                        try {
+                            // Wyślij żądanie DELETE do serwera
+                            const response = await fetch(`http://localhost:5005/task-manager/auth/delete-group/${group.id}`, {
+                                method: 'DELETE',
+                                credentials: 'include',
+                            });
+
+                            // Debug: wyświetl dane grupy w konsoli
+                            console.log(`Usuwanie grupy: ${group.id}, ${group.name}`);
+
+                            if (response.ok) {
+                                // Pomyślne usunięcie
+                                alert('Grupa została usunięta.');
+                                await fetchGroups(); // Odśwież listę grup po usunięciu
+                            } else {
+                                // Obsłuż błąd z serwera
+                                const errorText = await response.json();
+                                throw new Error(errorText.message || 'Błąd serwera');
+                            }
+                        } catch (error) {
+                            // Obsługa błędu po stronie klienta
+                            console.error('Błąd:', error);
+                            alert('Nie udało się usunąć grupy. ' + error.message);
+                        }
+                    });
+
+                    // Dodaj przycisk do elementu grupy
+                    groupItem.appendChild(deleteButton);
+                });
+            }
+
+
+
+            // Wylogowanie
+            document.getElementById('logout-btn').addEventListener('click', () => {
+            fetch('http://localhost:5005/task-manager/auth/logout', {
+                method: 'GET',
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Wylogowano pomyślnie');
+                    window.location.href = 'index.html';
+                } else {
+                    alert('Błąd podczas wylogowywania');
+                }
+            })
+            .catch(error => {
+                console.error('Błąd:', error);
+                alert('Nie udało się połączyć z serwerem');
+            });
+        });
+
+            // Renderowanie grup przy załadowaniu strony
+            fetchGroups();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Logowanie</title>
+    <link rel="stylesheet" href="style_reg.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Lewa część: Formularz logowania -->
+        <div class="left-panel">
+            <div class="napis">
+                <h1 class="block-effect" style="--td: 1.2s">
+                    <div class="block-reveal" style="--bc: #559281; --d: .1s">Task</div>
+                    <div class="block-reveal" style="--bc: #7d3cff; --d: .5s">Planner</div>
+                </h1>
+            </div>
+
+            <p>Zaloguj się, aby kontynuować</p>
+            <br>
+            
+            <form id="login-form">
+                <!-- Pole e-mail z ikoną -->
+                <div class="input-container">
+                    <input type="email" id="email" name="email" placeholder="Email" required>
+                    <img src="email-icon.jpg" alt="Email" class="input-containerimg">
+                </div>
+
+                <!-- Pole hasło z ikoną -->
+                <div class="input-container">
+                    
+                    <input type="password" id="password" name="password" placeholder="Haslo" required>
+                    <img src="password-icon.png" alt="Haslo" class="input-containerimg">
+                </div>
+
+                <p><a href="#">Nie pamiętasz hasła?</a></p>
+                <br>
+
+                <!-- Przycisk logowania -->
+                <button type="submit">Zaloguj</button>
+
+                <!-- Separator -->
+                <div class="separator">Lub</div>
+
+                <!-- Logowanie przez social media -->
+                <div class="social-login">
+                    <a href="#"><img src="fb.png" alt="Facebook"></a>
+                    <a href="#"><img src="google.png" alt="Google"></a>
+                    <a href="#"><img src="apple.png" alt="Apple"></a>
+                </div>
+            </form>
+            <br>
+            <p>Nie masz jeszcze konta? <a href="registration.html">Zarejestruj się</a></p>
+        </div>
+
+    <script>
+        // Skrypt obsługujący logowanie
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault(); // Zatrzymanie domyślnego zachowania formularza
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('http://localhost:5005/task-manager/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('Logowanie powiodło się!');
+                    console.log('Odpowiedź serwera:', data);
+
+                    // Przekierowanie użytkownika po pomyślnym zalogowaniu
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 500); 
+                } else {
+                    // Obsługa błędów logowania
+                    const errorData = await response.json();
+                    alert(`Błąd: ${errorData.message || 'Nieprawidłowe dane logowania'}`);
+                }
+            } catch (error) {
+                console.error('Błąd połączenia:', error);
+                alert('Nie udało się połączyć z serwerem');
+            }
+        });
+    </script>
+</body>
+</html>

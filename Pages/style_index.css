@@ -1,0 +1,114 @@
+/* Ogólne ustawienia */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #181818;
+    color: #fff;
+}
+
+/* Główne kontenery */
+.container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Lewa część */
+.left-panel {
+    width: 35%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #3A3A3A;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.left-panel h1 {
+    margin-bottom: 10px;
+    font-size: 24px;
+    color: #555;
+}
+
+.left-panel p {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+/* Formularz */
+form {
+    width: 100%;
+    max-width: 300px;
+}
+
+form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+form input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+form button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #F06543;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #791f09;
+}
+
+/* Linki */
+form a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+form a:hover {
+    text-decoration: underline;
+}
+
+/* Prawa część */
+.right-panel {
+    width: 65%;
+    background-color: #3A3A3A;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Przyciski logowania */
+form .alt-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form .alt-login button {
+    margin-top: 10px;
+    background-color: #db4437;
+}
+
+form .alt-login button:hover {
+    background-color: #b83e2d;
+}
