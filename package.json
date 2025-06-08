@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/G4C3K2/Inzynieria_Internmetu.git"
+    "url": "git+https://github.com/MichalSurzyn/Sesja_tokeny.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/G4C3K2/Inzynieria_Internmetu/issues"
+    "url": "https://github.com/MichalSurzyn/Sesja_tokeny/issues"
   },
-  "homepage": "https://github.com/G4C3K2/Inzynieria_Internmetu#readme",
+  "homepage": "https://github.com/MichalSurzyn/Sesja_tokeny#readme",
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
